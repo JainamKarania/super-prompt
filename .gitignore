@@ -1,0 +1,22 @@
+# env and secrets
+.env
+.env.*
+!.env.example
+
+# node
+node_modules/
+.next/
+coverage/
+
+# python
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# os / editor
+.DS_Store
+.idea/
+.vscode/
