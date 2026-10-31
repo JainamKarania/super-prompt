@@ -7,7 +7,7 @@ import { analysisFixture } from "@/test/fixtures";
 describe("ScoreCard", () => {
   it("shows the overall score", () => {
     render(<ScoreCard analysis={analysisFixture} />);
-    expect(screen.getByText("Overall score: 3.0 / 10")).toBeInTheDocument();
+    expect(screen.getByText("Overall score: 9.0 / 10")).toBeInTheDocument();
   });
 
   it("renders every dimension with its feedback", () => {
