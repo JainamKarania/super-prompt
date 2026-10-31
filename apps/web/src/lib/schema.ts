@@ -24,6 +24,7 @@ export const Dimension = z.object({
 
 export const Analysis = z.object({
   id: z.string(),
+  createdAt: z.string().transform((str) => new Date(str)),
   original: z.string(),
   improved: z.string(),
   overall: z.number().min(0).max(10),
