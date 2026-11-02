@@ -36,7 +36,6 @@ jobs:
       - run: pnpm typecheck
       - run: pnpm test
       - run: pnpm build
-
   api:
     runs-on: ubuntu-latest
     defaults:
