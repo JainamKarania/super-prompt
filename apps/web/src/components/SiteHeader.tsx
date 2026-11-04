@@ -14,7 +14,7 @@ export function SiteHeader() {
           href="/history"
           className="text-muted-foreground hover:text-foreground"
         >
-          History
+          Prompt History
         </Link>
       </nav>
     </header>
