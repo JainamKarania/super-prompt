@@ -41,6 +41,23 @@ jobs:
     defaults:
       run:
         working-directory: apps/api
+    services:
+      db:
+        image: pgvector/pgvector:pg16
+        env:
+          POSTGRES_USER: coach
+          POSTGRES_PASSWORD: coach
+          POSTGRES_DB: coach
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U coach"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 10
+    env:
+      DATABASE_URL: postgresql+asyncpg://coach:coach@localhost:5432/coach
+      TEST_DATABASE_URL: postgresql+asyncpg://coach:coach@localhost:5432/coach
     steps:
       - uses: actions/checkout@v4
 
@@ -53,4 +70,5 @@ jobs:
       - run: uv run ruff check .
       - run: uv run ruff format --check .
       - run: uv run mypy app tests
+      - run: uv run alembic upgrade head
       - run: uv run pytest
