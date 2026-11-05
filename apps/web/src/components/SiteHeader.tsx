@@ -5,7 +5,7 @@ export function SiteHeader() {
     <header className="border-b">
       <nav className="mx-auto flex max-w-4xl items-center gap-6 p-4 text-sm font-medium">
         <Link href="/" className="font-bold">
-          Prompt Coach
+          Super Prompt
         </Link>
         <Link href="/" className="text-muted-foreground hover:text-foreground">
           Analyze
@@ -14,7 +14,7 @@ export function SiteHeader() {
           href="/history"
           className="text-muted-foreground hover:text-foreground"
         >
-          History
+          Prompt History
         </Link>
       </nav>
     </header>
