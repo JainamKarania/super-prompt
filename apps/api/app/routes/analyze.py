@@ -1,15 +1,15 @@
-from datetime import UTC, datetime
-from uuid import uuid4
-
 from fastapi import APIRouter
 
+from app.db import repository
+from app.db.session import SessionDep
+from app.mapping import to_analysis
 from app.schemas import Analysis, AnalyzeRequest, Dimension
 
 router = APIRouter()
 
 
 @router.post("/analyze", response_model=Analysis)
-def analyze(req: AnalyzeRequest) -> Analysis:
+async def analyze(req: AnalyzeRequest, session: SessionDep) -> Analysis:
     dimensions = [
         Dimension(name="clarity", score=6, feedback="The goal is understandable but vague."),
         Dimension(name="context", score=3, feedback="No background on audience or purpose."),
@@ -19,9 +19,8 @@ def analyze(req: AnalyzeRequest) -> Analysis:
     ]
     overall = sum(d.score for d in dimensions) / len(dimensions)
 
-    return Analysis(
-        id=str(uuid4()),
-        created_at=datetime.now(UTC).isoformat(),
+    record = await repository.create(
+        session,
         original=req.prompt,
         improved=(
             f"You are helping with a {req.task} task.\n\n"
@@ -31,11 +30,13 @@ def analyze(req: AnalyzeRequest) -> Analysis:
             "Output format: [bullets, table, JSON, etc.]\n"
             "Example of a good answer: [paste one]"
         ),
+        task=req.task,
         overall=overall,
-        dimensions=dimensions,
+        dimensions=[d.model_dump() for d in dimensions],
         changes=[
             "Added a role and a task type",
             "Added placeholders for audience, constraints, and format",
             "Added a slot for an example answer",
         ],
     )
+    return to_analysis(record)

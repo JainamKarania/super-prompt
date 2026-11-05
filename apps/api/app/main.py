@@ -2,7 +2,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.routes import analyze
+from app.routes import analyses, analyze
 
 app = FastAPI(title="Prompt Coach API")
 
@@ -14,6 +14,7 @@ app.add_middleware(
 )
 
 app.include_router(analyze.router, prefix="/api")
+app.include_router(analyses.router, prefix="/api")
 
 
 @app.get("/health")

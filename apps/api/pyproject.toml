@@ -12,6 +12,7 @@ dependencies = [
     "asyncpg>=0.32.0",
     "fastapi>=0.162.0",
     "pydantic-settings>=2.16.2",
+    "pytest>=9.2.0",
     "sqlalchemy[asyncio]>=2.1.8",
     "uvicorn[standard]>=0.54.0",
 ]
@@ -26,6 +27,7 @@ build-backend = "uv_build"
 [tool.pytest.ini_options]
 pythonpath = ["."]
 testpaths = ["tests"]
+asyncio_mode = "auto"
 
 [tool.ruff]
 line-length = 100
@@ -43,5 +45,6 @@ dev = [
     "httpx2>=2.16.0",
     "mypy>=2.4.1",
     "pytest>=9.2.0",
+    "pytest-asyncio>=1.4.1.post1",
     "ruff>=0.17.3",
 ]
