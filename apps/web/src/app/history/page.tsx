@@ -10,6 +10,13 @@ import type { Analysis } from "@/lib/schema";
 
 export default function HistoryPage() {
   const [items, setItems] = useState<Analysis[] | null>(null);
+  const [failed, setFailed] = useState(false);
+
+useEffect(() => {
+  listAnalyses()
+    .then(setItems)
+    .catch(() => setFailed(true));
+}, []);
 
   useEffect(() => {
     listAnalyses().then(setItems);
@@ -20,6 +27,12 @@ export default function HistoryPage() {
       <h1 className="text-3xl font-bold">History</h1>
 
       {items === null && <Skeleton className="h-24 w-full" />}
+
+      {failed && (
+  <p className="text-destructive">
+    Could not load history. Is the API running?
+  </p>
+      )}
 
       {items?.length === 0 && (
         <p className="text-muted-foreground">

@@ -14,6 +14,13 @@ export default function HistoryDetailPage() {
   const [analysis, setAnalysis] = useState<Analysis | null | undefined>(
     undefined,
   );
+  const [failed, setFailed] = useState(false);
+
+useEffect(() => {
+  getAnalysis(id)
+    .then(setAnalysis)
+    .catch(() => setFailed(true));
+}, [id]);
 
   useEffect(() => {
     getAnalysis(id).then(setAnalysis);
@@ -26,6 +33,12 @@ export default function HistoryDetailPage() {
       </Link>
 
       {analysis === undefined && <Skeleton className="h-40 w-full" />}
+
+      {failed && (
+  <p className="text-destructive">
+    Could not load this analysis. Is the API running?
+  </p>
+)}
 
       {analysis === null && <p>That analysis was not found.</p>}
 
