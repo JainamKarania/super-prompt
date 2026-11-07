@@ -4,7 +4,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import settings
 from app.routes import analyses, analyze
 
-app = FastAPI(title="Prompt Coach API")
+app = FastAPI(title="Super Prompt API")
 
 app.add_middleware(
     CORSMiddleware,
