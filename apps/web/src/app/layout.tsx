@@ -16,7 +16,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Prompt Coach",
+  title: "super-prompt",
   description: "Score and improve your AI prompts",
 };
 

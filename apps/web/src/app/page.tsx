@@ -37,7 +37,7 @@ export default function Home() {
 
   return (
     <main className="mx-auto max-w-4xl space-y-6 p-6">
-      <h1 className="text-3xl font-bold">Prompt Coach</h1>
+      <h1 className="text-3xl font-bold">Super Prompt</h1>
 
       <form onSubmit={onSubmit} className="space-y-4">
         <Textarea
