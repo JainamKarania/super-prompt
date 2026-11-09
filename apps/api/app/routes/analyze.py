@@ -1,42 +1,35 @@
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, HTTPException
 
 from app.db import repository
 from app.db.session import SessionDep
 from app.mapping import to_analysis
-from app.schemas import Analysis, AnalyzeRequest, Dimension
+from app.schemas import Analysis, AnalyzeRequest
+from app.services.coach import Coach, CoachError, CoachRateLimited, get_coach
 
 router = APIRouter()
 
+CoachDep = Annotated[Coach, Depends(get_coach)]
+
 
 @router.post("/analyze", response_model=Analysis)
-async def analyze(req: AnalyzeRequest, session: SessionDep) -> Analysis:
-    dimensions = [
-        Dimension(name="clarity", score=6, feedback="The goal is understandable but vague."),
-        Dimension(name="context", score=3, feedback="No background on audience or purpose."),
-        Dimension(name="constraints", score=4, feedback="No limits on length, tone, or scope."),
-        Dimension(name="format", score=2, feedback="The desired output format is not stated."),
-        Dimension(name="examples", score=1, feedback="No example of a good answer."),
-    ]
-    overall = sum(d.score for d in dimensions) / len(dimensions)
+async def analyze(req: AnalyzeRequest, session: SessionDep, coach: CoachDep) -> Analysis:
+    try:
+        out = await coach.coach(req.prompt, req.task)
+    except CoachRateLimited as exc:
+        raise HTTPException(429, "The model is rate limited. Try again in a minute.") from exc
+    except CoachError as exc:
+        raise HTTPException(502, "The coaching model failed. Please try again.") from exc
 
+    overall = sum(d.score for d in out.dimensions) / len(out.dimensions)
     record = await repository.create(
         session,
         original=req.prompt,
-        improved=(
-            f"You are helping with a {req.task} task.\n\n"
-            f"Task: {req.prompt}\n\n"
-            "Audience and purpose: [describe who this is for and why]\n"
-            "Constraints: [length, tone, scope]\n"
-            "Output format: [bullets, table, JSON, etc.]\n"
-            "Example of a good answer: [paste one]"
-        ),
+        improved=out.improved,
         task=req.task,
         overall=overall,
-        dimensions=[d.model_dump() for d in dimensions],
-        changes=[
-            "Added a role and a task type",
-            "Added placeholders for audience, constraints, and format",
-            "Added a slot for an example answer",
-        ],
+        dimensions=[d.model_dump() for d in out.dimensions],
+        changes=out.changes,
     )
     return to_analysis(record)
