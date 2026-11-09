@@ -1,5 +1,5 @@
 import os
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Iterator
 
 import pytest
 from httpx import ASGITransport, AsyncClient
@@ -12,10 +12,20 @@ from app.core.config import settings
 from app.db.models import Base
 from app.db.session import get_session
 from app.main import app
+from app.services.coach import get_coach
+from tests.stubs import StubCoach
 
 
 @pytest.fixture
-async def client() -> AsyncIterator[AsyncClient]:
+def stub_coach() -> Iterator[StubCoach]:
+    stub = StubCoach()
+    app.dependency_overrides[get_coach] = lambda: stub
+    yield stub
+    app.dependency_overrides.pop(get_coach, None)
+
+
+@pytest.fixture
+async def client(stub_coach: StubCoach) -> AsyncIterator[AsyncClient]:
     test_url = os.environ.get("TEST_DATABASE_URL")
     if not test_url:
         pytest.skip("TEST_DATABASE_URL is not set")
@@ -37,5 +47,5 @@ async def client() -> AsyncIterator[AsyncClient]:
     transport = ASGITransport(app=app)
     async with AsyncClient(transport=transport, base_url="http://test") as c:
         yield c
-    app.dependency_overrides.clear()
+    app.dependency_overrides.pop(get_session, None)
     await engine.dispose()
