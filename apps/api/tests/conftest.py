@@ -35,6 +35,7 @@ async def client(stub_coach: StubCoach) -> AsyncIterator[AsyncClient]:
 
     engine = create_async_engine(test_url, poolclass=NullPool)
     async with engine.begin() as conn:
+        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
         await conn.run_sync(Base.metadata.create_all)
         await conn.execute(text("TRUNCATE analyses"))
     maker = async_sessionmaker(engine, expire_on_commit=False)
