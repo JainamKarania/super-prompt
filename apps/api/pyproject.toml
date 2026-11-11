@@ -11,9 +11,11 @@ dependencies = [
     "alembic>=1.20.1",
     "asyncpg>=0.32.0",
     "fastapi>=0.162.0",
+    "fastembed>=0.9.1",
     "langchain-openai>=1.7.4",
     "langgraph>=1.2.20",
     "openai>=3.46.0",
+    "pgvector>=0.5.1",
     "pydantic-settings>=2.16.2",
     "pytest>=9.2.0",
     "sqlalchemy[asyncio]>=2.1.8",
@@ -31,6 +33,12 @@ build-backend = "uv_build"
 pythonpath = ["."]
 testpaths = ["tests"]
 asyncio_mode = "auto"
+addopts = "-m 'not embedding'"
+markers = ["embedding: needs the real embedding model (downloads it on first run)"]
+
+[[tool.mypy.overrides]]
+module = ["fastembed.*", "pgvector.*"]
+ignore_missing_imports = true
 
 [tool.ruff]
 line-length = 100
