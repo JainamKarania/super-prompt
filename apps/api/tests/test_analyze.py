@@ -78,3 +78,11 @@ async def test_failed_model_returns_502_and_saves_nothing(
     r = await client.post("/api/analyze", json=BODY)
     assert r.status_code == 502
     assert (await client.get("/api/analyses")).json() == []
+
+
+async def test_techniques_are_returned_and_saved(client: AsyncClient) -> None:
+    expected = [{"title": "Specify the output format", "source": "https://example.com/format"}]
+    created = (await client.post("/api/analyze", json=BODY)).json()
+    assert created["techniques"] == expected
+    fetched = (await client.get(f"/api/analyses/{created['id']}")).json()
+    assert fetched["techniques"] == expected

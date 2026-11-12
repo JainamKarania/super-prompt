@@ -18,6 +18,11 @@ class Dimension(BaseModel):
     feedback: str
 
 
+class Technique(BaseModel):
+    title: str
+    source: str
+
+
 class Analysis(BaseModel):
     model_config = ConfigDict(alias_generator=to_camel, populate_by_name=True)
 
@@ -28,3 +33,4 @@ class Analysis(BaseModel):
     overall: float = Field(ge=0, le=10)
     dimensions: list[Dimension]
     changes: list[str]
+    techniques: list[Technique] = Field(default_factory=list)

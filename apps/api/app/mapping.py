@@ -1,5 +1,5 @@
 from app.db.models import AnalysisRecord
-from app.schemas import Analysis, Dimension
+from app.schemas import Analysis, Dimension, Technique
 
 
 def to_analysis(record: AnalysisRecord) -> Analysis:
@@ -11,4 +11,5 @@ def to_analysis(record: AnalysisRecord) -> Analysis:
         overall=record.overall,
         dimensions=[Dimension(**d) for d in record.dimensions],
         changes=record.changes,
+        techniques=[Technique(**t) for t in record.techniques],
     )

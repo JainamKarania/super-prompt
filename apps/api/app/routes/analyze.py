@@ -31,5 +31,6 @@ async def analyze(req: AnalyzeRequest, session: SessionDep, coach: CoachDep) -> 
         overall=overall,
         dimensions=[d.model_dump() for d in out.dimensions],
         changes=out.changes,
+        techniques=[t.model_dump() for t in out.techniques],
     )
     return to_analysis(record)

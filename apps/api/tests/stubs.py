@@ -1,4 +1,4 @@
-from app.schemas import Dimension, TaskType
+from app.schemas import Dimension, TaskType, Technique
 from app.services.coach import CoachError, CoachOut
 
 
@@ -21,4 +21,7 @@ class StubCoach:
             ],
             improved=f"IMPROVED: {prompt}",
             changes=["Added a role"],
+            techniques=[
+                Technique(title="Specify the output format", source="https://example.com/format")
+            ],
         )
