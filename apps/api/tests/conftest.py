@@ -15,6 +15,8 @@ from app.main import app
 from app.services.coach import get_coach
 from tests.stubs import StubCoach
 
+LOCAL_HOSTS = {"localhost", "127.0.0.1"}
+
 
 @pytest.fixture
 def stub_coach() -> Iterator[StubCoach]:
@@ -25,23 +27,32 @@ def stub_coach() -> Iterator[StubCoach]:
 
 
 @pytest.fixture
-async def client(stub_coach: StubCoach) -> AsyncIterator[AsyncClient]:
+async def session_maker() -> AsyncIterator[async_sessionmaker[AsyncSession]]:
     test_url = os.environ.get("TEST_DATABASE_URL")
     if not test_url:
         pytest.skip("TEST_DATABASE_URL is not set")
-    is_local = make_url(test_url).host in {"localhost", "127.0.0.1"}
-    if test_url == settings.database_url and not is_local:
+
+    test = make_url(test_url)
+    real = make_url(settings.database_url)
+    same_database = (test.host, test.port, test.database) == (real.host, real.port, real.database)
+    if same_database and test.host not in LOCAL_HOSTS:
         pytest.fail("TEST_DATABASE_URL must not point at your real database")
 
     engine = create_async_engine(test_url, poolclass=NullPool)
     async with engine.begin() as conn:
         await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector"))
+        await conn.run_sync(Base.metadata.drop_all)
         await conn.run_sync(Base.metadata.create_all)
-        await conn.execute(text("TRUNCATE analyses"))
-    maker = async_sessionmaker(engine, expire_on_commit=False)
+    yield async_sessionmaker(engine, expire_on_commit=False)
+    await engine.dispose()
 
+
+@pytest.fixture
+async def client(
+    stub_coach: StubCoach, session_maker: async_sessionmaker[AsyncSession]
+) -> AsyncIterator[AsyncClient]:
     async def override() -> AsyncIterator[AsyncSession]:
-        async with maker() as session:
+        async with session_maker() as session:
             yield session
 
     app.dependency_overrides[get_session] = override
@@ -49,4 +60,3 @@ async def client(stub_coach: StubCoach) -> AsyncIterator[AsyncClient]:
     async with AsyncClient(transport=transport, base_url="http://test") as c:
         yield c
     app.dependency_overrides.pop(get_session, None)
-    await engine.dispose()

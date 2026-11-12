@@ -22,6 +22,7 @@ async def create(
     overall: float,
     dimensions: list[dict[str, Any]],
     changes: list[str],
+    techniques: list[dict[str, str]],
 ) -> AnalysisRecord:
     record = AnalysisRecord(
         original=original,
@@ -30,6 +31,7 @@ async def create(
         overall=overall,
         dimensions=dimensions,
         changes=changes,
+        techniques=techniques,
         prompt_hash=prompt_hash(original, task),
     )
     session.add(record)
