@@ -22,6 +22,12 @@ export const Dimension = z.object({
   feedback: z.string(),
 });
 
+export const Technique = z.object({
+  title: z.string(),
+  source: z.string(),
+});
+export type Technique = z.infer<typeof Technique>;
+
 export const Analysis = z.object({
   id: z.string(),
   createdAt: z.string().transform((str) => new Date(str)),
@@ -30,5 +36,6 @@ export const Analysis = z.object({
   overall: z.number().min(0).max(10),
   dimensions: z.array(Dimension),
   changes: z.array(z.string()),
+  techniques: z.array(Technique).default([]),
 });
 export type Analysis = z.infer<typeof Analysis>;

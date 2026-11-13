@@ -16,6 +16,7 @@ import { ScoreCard } from "@/components/ScoreCard";
 import { RewriteView } from "@/components/RewriteView";
 import { analyzePrompt } from "@/lib/api";
 import { TASK_TYPES, type Analysis, type TaskType } from "@/lib/schema";
+import { TechniquesUsed } from "@/components/TechniquesUsed";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
@@ -76,8 +77,9 @@ export default function Home() {
         <div className="space-y-6">
           <ScoreCard analysis={result} />
           <RewriteView analysis={result} />
+          <TechniquesUsed techniques={result.techniques} />
         </div>
-      )}
+        )}
     </main>
   );
 }

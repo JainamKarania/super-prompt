@@ -12,4 +12,5 @@ export const analysisFixture: Analysis = {
     feedback: `${name} feedback`,
   })),
   changes: ["Added a role"],
+  techniques: [],
 };
