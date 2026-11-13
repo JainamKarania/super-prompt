@@ -7,13 +7,14 @@ from app.db.session import SessionDep
 from app.mapping import to_analysis
 from app.schemas import Analysis, AnalyzeRequest
 from app.services.coach import Coach, CoachError, CoachRateLimited, get_coach
+from app.services.ratelimit import rate_limit
 
 router = APIRouter()
 
 CoachDep = Annotated[Coach, Depends(get_coach)]
 
 
-@router.post("/analyze", response_model=Analysis)
+@router.post("/analyze", response_model=Analysis, dependencies=[Depends(rate_limit)])
 async def analyze(req: AnalyzeRequest, session: SessionDep, coach: CoachDep) -> Analysis:
     try:
         out = await coach.coach(req.prompt, req.task)

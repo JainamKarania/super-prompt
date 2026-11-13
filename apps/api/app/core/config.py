@@ -13,7 +13,10 @@ class Settings(BaseSettings):
 
     llm_api_key: SecretStr = SecretStr("")
     llm_base_url: str = "https://api.groq.com/openai/v1"
-    llm_model: str = "openai/gpt-oss-120b"
+    llm_model: str = "openai/gpt-oss-20b"
+    redis_url: SecretStr | None = None
+    cache_ttl_seconds: int = 86400
+    rate_limit_per_minute: int = 10
 
     @property
     def cors_origin_list(self) -> list[str]:
