@@ -158,4 +158,8 @@ class LLMCoach:
 
 @lru_cache
 def get_coach() -> Coach:
-    return LLMCoach()
+    # imported here because cache.py imports from this module
+    from app.services.cache import CachedCoach
+    from app.services.redis_client import get_redis
+
+    return CachedCoach(LLMCoach(), get_redis())
