@@ -8,6 +8,7 @@ import { ScoreCard } from "@/components/ScoreCard";
 import { RewriteView } from "@/components/RewriteView";
 import { getAnalysis } from "@/lib/api";
 import type { Analysis } from "@/lib/schema";
+import { TechniquesUsed } from "@/components/TechniquesUsed";
 
 export default function HistoryDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -46,6 +47,7 @@ useEffect(() => {
         <>
           <ScoreCard analysis={analysis} />
           <RewriteView analysis={analysis} />
+          <TechniquesUsed techniques={analysis.techniques} />
         </>
       )}
     </main>
