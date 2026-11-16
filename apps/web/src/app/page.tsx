@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { toast } from "sonner";
+// import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -14,12 +14,13 @@ import {
 } from "@/components/ui/select";
 import { ScoreCard } from "@/components/ScoreCard";
 import { RewriteView } from "@/components/RewriteView";
-import { analyzePrompt } from "@/lib/api";
+import { analyzePrompt, errorMessage } from "@/lib/api";
 import { TASK_TYPES, type Analysis, type TaskType } from "@/lib/schema";
 import { TechniquesUsed } from "@/components/TechniquesUsed";
 
 export default function Home() {
   const [prompt, setPrompt] = useState("");
+  const [error, setError] = useState<string | null>(null);
   const [task, setTask] = useState<TaskType>("writing");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<Analysis | null>(null);
@@ -29,8 +30,9 @@ export default function Home() {
     setLoading(true);
     try {
       setResult(await analyzePrompt({ prompt, task }));
-    } catch {
-      toast.error("Something went wrong. Please try again.");
+    } catch (err) {
+      setError(errorMessage(err));
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -66,6 +68,12 @@ export default function Home() {
         </div>
       </form>
 
+      {error ? (
+        <p role="alert" className="text-sm text-destructive">
+          {error}
+        </p>
+      ) : null}
+
       {loading && (
         <div className="space-y-3">
           <Skeleton className="h-40 w-full" />
@@ -79,7 +87,7 @@ export default function Home() {
           <RewriteView analysis={result} />
           <TechniquesUsed techniques={result.techniques} />
         </div>
-        )}
+      )}
     </main>
   );
 }

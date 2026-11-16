@@ -9,6 +9,7 @@ app = FastAPI(title="Super Prompt API")
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origin_list,
+    expose_headers=["Retry-After"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
