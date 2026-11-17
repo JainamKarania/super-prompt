@@ -10,6 +10,7 @@ from app.core.config import settings
 from app.schemas import Dimension, DimensionName, TaskType, Technique
 from app.services.graph import RewriteOut, Steps, build_graph
 from app.services.retrieval import Guidance, PgRetriever, Retriever
+from app.services.tracing import get_callbacks
 
 SCORE_SYSTEM = (
     "You are super-prompt, a prompt-engineering coach. The user gives you a prompt they wrote "
@@ -140,7 +141,13 @@ class LLMCoach:
 
     async def coach(self, prompt: str, task: TaskType) -> CoachOut:
         try:
-            final = await self._graph.ainvoke({"prompt": prompt, "task": task})
+            final = await self._graph.ainvoke(
+                {"prompt": prompt, "task": task},
+                config={
+                    "callbacks": get_callbacks(),
+                    "metadata": {"langfuse_tags": [task, settings.llm_model]},
+                },
+            )
             return CoachOut(
                 dimensions=final["dimensions"],
                 improved=final["best_improved"],
