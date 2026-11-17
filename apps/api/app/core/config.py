@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     redis_url: SecretStr | None = None
     cache_ttl_seconds: int = 86400
     rate_limit_per_minute: int = 10
+    langfuse_public_key: str | None = None
+    langfuse_secret_key: SecretStr | None = None
+    langfuse_base_url: str = "https://cloud.langfuse.com"
 
     @property
     def cors_origin_list(self) -> list[str]:
