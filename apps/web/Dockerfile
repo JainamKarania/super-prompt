@@ -6,7 +6,7 @@ WORKDIR /app
 
 # ---- install dependencies (cached until the lockfile changes) ----
 FROM base AS deps
-COPY package.json pnpm-lock.yaml ./
+COPY package.json pnpm-lock.yaml pnpm-workspace.yaml* .npmrc* ./
 RUN --mount=type=cache,target=/root/.local/share/pnpm/store \
     pnpm install --frozen-lockfile
 
