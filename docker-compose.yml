@@ -1,0 +1,31 @@
+# Runs the whole app locally from the built images:  docker compose up --build
+# The API reads its secrets from apps/api/.env (never baked into the image).
+services:
+  api:
+    build: ./apps/api
+    env_file:
+      - path: ./apps/api/.env
+        required: false
+    ports:
+      - "8000:8000"
+    healthcheck:
+      test:
+        - CMD
+        - python
+        - -c
+        - "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/health')"
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+
+  web:
+    build:
+      context: ./apps/web
+      args:
+        NEXT_PUBLIC_API_URL: http://localhost:8000
+    ports:
+      - "3000:3000"
+    depends_on:
+      api:
+        condition: service_healthy
