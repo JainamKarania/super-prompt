@@ -4,6 +4,7 @@ import { SiteHeader } from "@/components/SiteHeader";
 import { Toaster } from "@/components/ui/sonner"; // added
 import "./globals.css";
 import { Suspense } from "react";
+import { SiteFooter } from "@/components/SiteFooter";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -17,7 +18,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: "super-prompt",
-  description: "Score and improve your AI prompts",
+  description:
+    "Score your AI prompts, get a better rewrite, and learn the techniques behind it.",
 };
 
 export default function RootLayout({
@@ -33,7 +35,8 @@ export default function RootLayout({
         <Suspense fallback={<div className="mx-auto max-w-4xl p-6">Loading...</div>}>
           <SiteHeader />
           {children}
-          <Toaster /> {/* added */}
+          <Toaster />
+          <SiteFooter />
         </Suspense>
       </body>
     </html>

@@ -1,93 +1,93 @@
-"use client";
+import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 
-import { useState } from "react";
-// import { toast } from "sonner";
-import { Button } from "@/components/ui/button";
-import { Textarea } from "@/components/ui/textarea";
-import { Skeleton } from "@/components/ui/skeleton";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { ScoreCard } from "@/components/ScoreCard";
-import { RewriteView } from "@/components/RewriteView";
-import { analyzePrompt, errorMessage } from "@/lib/api";
-import { TASK_TYPES, type Analysis, type TaskType } from "@/lib/schema";
-import { TechniquesUsed } from "@/components/TechniquesUsed";
+const steps = [
+  {
+    title: "Score it",
+    body: "Your prompt is rated on key areas such as clarity, context, constraints, format and examples, with feedback for each.",
+  },
+  {
+    title: "Rewrite it",
+    body: "An AI coach rewrites the prompt to fix the weakest areas, then checks that the new version scores higher.",
+  },
+  {
+    title: "Learn why",
+    body: "Every rewrite lists the prompting techniques behind it, with a link to the source, so you learn the pattern and not just the fix.",
+  },
+];
 
 export default function Home() {
-  const [prompt, setPrompt] = useState("");
-  const [error, setError] = useState<string | null>(null);
-  const [task, setTask] = useState<TaskType>("writing");
-  const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState<Analysis | null>(null);
-
-  async function onSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    setLoading(true);
-    try {
-      setResult(await analyzePrompt({ prompt, task }));
-    } catch (err) {
-      setError(errorMessage(err));
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  }
-
   return (
-    <main className="mx-auto max-w-4xl space-y-6 p-6">
-      <h1 className="text-3xl font-bold">Super Prompt</h1>
-
-      <form onSubmit={onSubmit} className="space-y-4">
-        <Textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Paste your prompt here..."
-          rows={6}
-        />
-        <div className="flex items-center gap-3">
-          <Select value={task} onValueChange={(v) => setTask(v as TaskType)}>
-            <SelectTrigger className="w-40">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {TASK_TYPES.map((t) => (
-                <SelectItem key={t} value={t} className="capitalize">
-                  {t}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-          <Button type="submit" disabled={loading || prompt.trim() === ""}>
-            {loading ? "Analyzing..." : "Analyze"}
-          </Button>
-        </div>
-      </form>
-
-      {error ? (
-        <p role="alert" className="text-sm text-destructive">
-          {error}
+    <main className="mx-auto max-w-4xl px-6">
+      <section className="space-y-6 py-16 text-center md:py-24">
+        <h1 className="text-4xl font-bold tracking-tight md:text-5xl">
+          Write better prompts. Get better answers.
+        </h1>
+        <p className="mx-auto max-w-2xl text-lg text-muted-foreground">
+          Paste a prompt and super-prompt scores it, rewrites it, and shows you
+          which techniques made it better.
         </p>
-      ) : null}
-
-      {loading && (
-        <div className="space-y-3">
-          <Skeleton className="h-40 w-full" />
-          <Skeleton className="h-40 w-full" />
+        <div className="flex flex-wrap items-center justify-center gap-3">
+          <Link href="/analyze" className={buttonVariants({ size: "lg" })}>
+            Analyze a prompt
+          </Link>
+          <a
+            href="#how-it-works"
+            className={buttonVariants({ size: "lg", variant: "outline" })}
+          >
+            See how it works
+          </a>
         </div>
-      )}
+      </section>
 
-      {!loading && result && (
-        <div className="space-y-6">
-          <ScoreCard analysis={result} />
-          <RewriteView analysis={result} />
-          <TechniquesUsed techniques={result.techniques} />
+      <section id="how-it-works" className="scroll-mt-8 space-y-6 py-12">
+        <h2 className="text-2xl font-semibold">How it works</h2>
+        <ol className="grid gap-4 md:grid-cols-3">
+          {steps.map((step, index) => (
+            <li key={step.title} className="space-y-2 rounded-lg border p-5">
+              <span className="flex size-8 items-center justify-center rounded-full bg-primary text-sm font-semibold text-primary-foreground">
+                {index + 1}
+              </span>
+              <h3 className="font-semibold">{step.title}</h3>
+              <p className="text-sm text-muted-foreground">{step.body}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <section className="space-y-6 py-12">
+        <h2 className="text-2xl font-semibold">A quick example</h2>
+        <div className="grid gap-4 md:grid-cols-2">
+          <div className="space-y-2 rounded-lg border p-5">
+            <p className="text-sm font-medium text-muted-foreground">Before</p>
+            <p className="text-sm">Write a blog post about coffee.</p>
+          </div>
+          <div className="space-y-2 rounded-lg border border-primary/40 bg-muted/40 p-5">
+            <p className="text-sm font-medium text-muted-foreground">After</p>
+            <p className="text-sm">
+              You are an experienced food writer. Write a 600-word blog post
+              about how beginners can brew better coffee at home. Use a friendly
+              tone, a short intro, three numbered tips with one example each,
+              and a one-sentence takeaway. Format it with Markdown headings.
+            </p>
+          </div>
         </div>
-      )}
+        <p className="text-sm text-muted-foreground">
+          The rewrite adds a role, an audience, constraints and an output
+          format, which are the things most prompts are missing.
+        </p>
+      </section>
+
+      <section className="space-y-4 py-16 text-center">
+        <h2 className="text-2xl font-semibold">Try it on your own prompt</h2>
+        <Link
+          href="/analyze"
+          className={cn(buttonVariants({ size: "lg" }), "mx-auto")}
+        >
+          Analyze a prompt
+        </Link>
+      </section>
     </main>
   );
 }
