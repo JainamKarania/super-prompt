@@ -7,8 +7,12 @@ import type { Analysis } from "@/lib/schema";
 
 export function RewriteView({ analysis }: { analysis: Analysis }) {
   async function copy() {
-    await navigator.clipboard.writeText(analysis.improved);
-    toast.success("Improved prompt copied");
+    try {
+      await navigator.clipboard.writeText(analysis.improved);
+      toast.success("Improved prompt copied");
+    } catch {
+      toast.error("Could not copy. Select the text and copy it manually.");
+    }
   }
 
   return (
