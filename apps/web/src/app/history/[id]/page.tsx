@@ -18,14 +18,18 @@ export default function HistoryDetailPage() {
   );
   const [failed, setFailed] = useState(false);
 
-useEffect(() => {
-  getAnalysis(id)
-    .then(setAnalysis)
-    .catch(() => setFailed(true));
-}, [id]);
-
   useEffect(() => {
-    getAnalysis(id).then(setAnalysis);
+    let cancelled = false;
+    getAnalysis(id)
+      .then((result) => {
+        if (!cancelled) setAnalysis(result);
+      })
+      .catch(() => {
+        if (!cancelled) setFailed(true);
+      });
+    return () => {
+      cancelled = true;
+    };
   }, [id]);
 
   return (
@@ -34,26 +38,28 @@ useEffect(() => {
         Back to history
       </Link>
 
-      {analysis === undefined && <Skeleton className="h-40 w-full" />}
+      {analysis === undefined && !failed && (
+        <Skeleton className="h-40 w-full" />
+      )}
 
       {failed && (
-  <p className="text-destructive">
-    Could not load this analysis. Is the API running?
-  </p>
-)}
+        <p role="alert" className="text-destructive">
+          Could not load this analysis. Is the API running?
+        </p>
+      )}
 
       {analysis === null && <p>That analysis was not found.</p>}
 
       {analysis && (
         <>
           <Reveal>
-          <ScoreCard analysis={analysis} />
+            <ScoreCard analysis={analysis} />
           </Reveal>
           <Reveal delay={0.15}>
-          <RewriteView analysis={analysis} />
+            <RewriteView analysis={analysis} />
           </Reveal>
           <Reveal delay={0.3}>
-          <TechniquesUsed techniques={analysis.techniques} />
+            <TechniquesUsed techniques={analysis.techniques} />
           </Reveal>
         </>
       )}

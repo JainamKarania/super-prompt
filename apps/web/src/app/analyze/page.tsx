@@ -40,17 +40,32 @@ export default function AnalyzePage() {
     }
   }
 
+  function onPromptKeyDown(e: React.KeyboardEvent<HTMLTextAreaElement>) {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) {
+      e.preventDefault();
+      if (!loading && prompt.trim() !== "") {
+        e.currentTarget.form?.requestSubmit();
+      }
+    }
+  }
+
   return (
     <main className="mx-auto max-w-4xl space-y-6 p-6">
       <h1 className="text-3xl font-bold">Analyze a prompt</h1>
 
       <form onSubmit={onSubmit} className="space-y-4">
-        <Textarea
-          value={prompt}
-          onChange={(e) => setPrompt(e.target.value)}
-          placeholder="Paste your prompt here..."
-          rows={6}
-        />
+        <div className="space-y-1">
+          <Textarea
+            value={prompt}
+            onChange={(e) => setPrompt(e.target.value)}
+            onKeyDown={onPromptKeyDown}
+            placeholder="Paste your prompt here..."
+            rows={6}
+          />
+          <p className="text-xs text-muted-foreground">
+            {prompt.length} characters · Ctrl+Enter to submit
+          </p>
+        </div>
         <div className="flex items-center gap-3">
           <Select value={task} onValueChange={(v) => setTask(v as TaskType)}>
             <SelectTrigger className="w-40">
