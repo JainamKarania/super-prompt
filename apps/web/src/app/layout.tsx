@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { SiteHeader } from "@/components/SiteHeader";
-import { Toaster } from "@/components/ui/sonner"; // added
+import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 import { Suspense } from "react";
 import { SiteFooter } from "@/components/SiteFooter";
+import { MotionProvider } from "@/components/motion";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -30,13 +31,17 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} flex min-h-screen flex-col antialiased`}
       >
-        <Suspense fallback={<div className="mx-auto max-w-4xl p-6">Loading...</div>}>
-          <SiteHeader />
-          {children}
-          <Toaster />
-          <SiteFooter />
+        <Suspense
+          fallback={<div className="mx-auto max-w-4xl p-6">Loading...</div>}
+        >
+          <MotionProvider>
+            <SiteHeader />
+            <div className="flex-1">{children}</div>
+            <Toaster />
+            <SiteFooter />
+          </MotionProvider>
         </Suspense>
       </body>
     </html>

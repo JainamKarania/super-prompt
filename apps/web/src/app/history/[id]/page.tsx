@@ -9,6 +9,7 @@ import { RewriteView } from "@/components/RewriteView";
 import { getAnalysis } from "@/lib/api";
 import type { Analysis } from "@/lib/schema";
 import { TechniquesUsed } from "@/components/TechniquesUsed";
+import { Reveal } from "@/components/motion";
 
 export default function HistoryDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -45,9 +46,15 @@ useEffect(() => {
 
       {analysis && (
         <>
+          <Reveal>
           <ScoreCard analysis={analysis} />
+          </Reveal>
+          <Reveal delay={0.15}>
           <RewriteView analysis={analysis} />
+          </Reveal>
+          <Reveal delay={0.3}>
           <TechniquesUsed techniques={analysis.techniques} />
+          </Reveal>
         </>
       )}
     </main>
