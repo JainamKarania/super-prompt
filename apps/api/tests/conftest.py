@@ -17,6 +17,8 @@ from tests.stubs import StubCoach
 
 LOCAL_HOSTS = {"localhost", "127.0.0.1"}
 
+OWNER_ID = "11111111-1111-4111-8111-111111111111"
+
 
 @pytest.fixture
 def stub_coach() -> Iterator[StubCoach]:
@@ -57,6 +59,8 @@ async def client(
 
     app.dependency_overrides[get_session] = override
     transport = ASGITransport(app=app)
-    async with AsyncClient(transport=transport, base_url="http://test") as c:
+    async with AsyncClient(
+        transport=transport, base_url="http://test", headers={"X-Owner-Id": OWNER_ID}
+    ) as c:
         yield c
     app.dependency_overrides.pop(get_session, None)

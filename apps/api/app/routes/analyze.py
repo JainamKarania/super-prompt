@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.db import repository
 from app.db.session import SessionDep
 from app.mapping import to_analysis
+from app.owner import OwnerDep
 from app.schemas import Analysis, AnalyzeRequest
 from app.services.coach import Coach, CoachError, CoachRateLimited, get_coach
 from app.services.ratelimit import rate_limit
@@ -15,7 +16,9 @@ CoachDep = Annotated[Coach, Depends(get_coach)]
 
 
 @router.post("/analyze", response_model=Analysis, dependencies=[Depends(rate_limit)])
-async def analyze(req: AnalyzeRequest, session: SessionDep, coach: CoachDep) -> Analysis:
+async def analyze(
+    req: AnalyzeRequest, session: SessionDep, coach: CoachDep, owner_id: OwnerDep
+) -> Analysis:
     try:
         out = await coach.coach(req.prompt, req.task)
     except CoachRateLimited as exc:
@@ -25,7 +28,8 @@ async def analyze(req: AnalyzeRequest, session: SessionDep, coach: CoachDep) -> 
 
     overall = sum(d.score for d in out.dimensions) / len(out.dimensions)
     record = await repository.create(
-        session,
+        owner_id=owner_id,
+        session=session,
         original=req.prompt,
         improved=out.improved,
         task=req.task,
