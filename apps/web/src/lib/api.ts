@@ -1,5 +1,6 @@
 import { z } from "zod";
 import { Analysis, type AnalyzeRequest } from "./schema";
+import { ownerHeaders } from "./owner";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? "http://localhost:8000";
 
@@ -29,7 +30,7 @@ export function errorMessage(err: unknown): string {
 export async function analyzePrompt(req: AnalyzeRequest): Promise<Analysis> {
   const res = await fetch(`${API_URL}/api/analyze`, {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: { "Content-Type": "application/json", ...ownerHeaders() },
     body: JSON.stringify(req),
   });
     if (!res.ok) {

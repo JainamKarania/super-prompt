@@ -16,6 +16,7 @@ def prompt_hash(prompt: str, task: str) -> str:
 async def create(
     session: AsyncSession,
     *,
+    owner_id: str,
     original: str,
     improved: str,
     task: str,
@@ -25,6 +26,7 @@ async def create(
     techniques: list[dict[str, str]],
 ) -> AnalysisRecord:
     record = AnalysisRecord(
+        owner_id=owner_id,
         original=original,
         improved=improved,
         task=task,
@@ -40,12 +42,24 @@ async def create(
     return record
 
 
-async def get(session: AsyncSession, analysis_id: uuid.UUID) -> AnalysisRecord | None:
-    return await session.get(AnalysisRecord, analysis_id)
+async def get(
+    session: AsyncSession, analysis_id: uuid.UUID, owner_id: str
+) -> AnalysisRecord | None:
+    return await session.scalar(
+        select(AnalysisRecord).where(
+            AnalysisRecord.id == analysis_id,
+            AnalysisRecord.owner_id == owner_id,
+        )
+    )
 
 
-async def list_recent(session: AsyncSession, limit: int = 50) -> list[AnalysisRecord]:
+async def list_recent(
+    session: AsyncSession, owner_id: str, limit: int = 50
+) -> list[AnalysisRecord]:
     result = await session.scalars(
-        select(AnalysisRecord).order_by(AnalysisRecord.created_at.desc()).limit(limit)
+        select(AnalysisRecord)
+        .where(AnalysisRecord.owner_id == owner_id)
+        .order_by(AnalysisRecord.created_at.desc())
+        .limit(limit)
     )
     return list(result)

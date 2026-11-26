@@ -16,7 +16,7 @@ class Base(DeclarativeBase):
 
 class AnalysisRecord(Base):
     __tablename__ = "analyses"
-
+    owner_id: Mapped[str] = mapped_column(String(64), index=True)
     id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     original: Mapped[str] = mapped_column(Text)
     improved: Mapped[str] = mapped_column(Text)
